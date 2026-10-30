@@ -1,0 +1,51 @@
+<html><head><style>
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#fff;color:#0f172a}
+#d{width:1400px;padding:30px 36px;box-sizing:border-box}
+h1{font-size:26px;margin:0 0 4px} .sub{color:#64748b;margin-bottom:22px;font-size:15px}
+.row{display:flex;align-items:center;gap:14px}
+.box{border:2px solid;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.4;background:#fff}
+.box b{font-size:15px}
+.arrow{color:#475569;font-size:22px;font-weight:700}
+.lbl{font-size:12px;color:#475569;text-align:center}
+.user{border-color:#f59e0b;background:#fff7e6}.fe{border-color:#0284c7;background:#e0f2fe}
+.be{border-color:#64748b;background:#f8fafc}.guard{border-color:#f59e0b;background:#fff1d6}
+.ai{border-color:#7c3aed;background:#ede9fe}.tool{border-color:#0284c7;background:#e0f2fe}
+.log{border-color:#16a34a;background:#dcfce7}.db{border-color:#16a34a;background:#dcfce7}
+.ext{border-color:#a21caf;background:#fdf4ff}.human{border-color:#e11d48;background:#ffe4e6}
+.frame{border:2px dashed #94a3b8;border-radius:16px;padding:16px;margin-top:18px;position:relative}
+.ftitle{position:absolute;top:-12px;left:16px;background:#fff;padding:0 8px;font-weight:700;color:#334155;font-size:14px}
+.pipe{display:grid;grid-template-columns:repeat(7,1fr);gap:0;align-items:stretch}
+.st{display:flex;align-items:stretch}
+.st .box{flex:1;font-size:13px}
+.st .arrow{align-self:center;padding:0 4px}
+.n{display:inline-block;width:22px;height:22px;border-radius:6px;color:#fff;text-align:center;line-height:22px;font-weight:800;margin-right:6px;font-size:13px}
+.guard .n{background:#f59e0b}.ai .n{background:#7c3aed}.tool .n{background:#0284c7}.log .n{background:#16a34a}
+.bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:22px}
+.legend{display:flex;gap:18px;margin-top:20px;font-size:13px;color:#475569}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+</style></head><body><div id="d">
+<h1>ParcelPe AI Support Desk — Architecture</h1>
+<div class="sub">Every customer message goes through the same 7 steps. Three of them are guardrails that sit around the AI.</div>
+<div class="row">
+ <div class="box user"><b>👤 Customer</b><br>WhatsApp · email · web<br>text + optional photo</div><div class="arrow">→</div>
+ <div class="box fe"><b>frontend/</b> · React + Vite<br>port 3000 (nginx in Docker)<br>Live demo · Ops console · Evals · Database</div>
+ <div><div class="lbl">POST /api/messages</div><div class="arrow">────→</div></div>
+ <div class="box be"><b>backend/</b> · Python FastAPI · port 8000<br>api.py → agent.py (the 7-step loop below)</div>
+</div>
+<div class="frame"><div class="ftitle">The agent loop · backend/app/agent.py</div>
+<div class="pipe">
+ <div class="st"><div class="box guard"><span class="n">1</span><b>Input guardrail</b><br>Mask Aadhaar, PAN, phone, email → [PHONE]…<br>Catch prompt injection → human</div><div class="arrow">→</div></div>
+ <div class="st"><div class="box ai"><span class="n">2</span><b>Understand</b> (LLM)<br>Intent, tracking ID, confidence</div><div class="arrow">→</div></div>
+ <div class="st"><div class="box tool"><span class="n">3</span><b>Act</b> (tools)<br>track_parcel · photo_check · check_refund_policy · update_address</div><div class="arrow">→</div></div>
+ <div class="st"><div class="box guard"><span class="n">4</span><b>Action guardrail</b><br>Payout &gt; ₹2,000, repeat claimer or confidence &lt; 70% → human</div><div class="arrow">→</div></div>
+ <div class="st"><div class="box ai"><span class="n">5</span><b>Draft reply</b> (LLM)<br>Written only from verified facts</div><div class="arrow">→</div></div>
+ <div class="st"><div class="box guard"><span class="n">6</span><b>Output guardrail</b><br>No unapproved refund promise, no personal data, not too long</div><div class="arrow">→</div></div>
+ <div class="st"><div class="box log"><span class="n">7</span><b>Audit trail</b><br>Every step, decision, cost and time saved</div></div>
+</div></div>
+<div class="bottom">
+ <div class="box ext"><b>✨ Google Gemini</b> (steps 2, 3, 5)<br>Reads the message, checks the photo, writes the reply.<br>If Gemini is down or the key is wrong → message goes to a human.</div>
+ <div class="box db"><b>🍃 MongoDB</b> (steps 3, 7)<br>parcels · messages · tickets · refunds<br>Browse at localhost:8081 (Mongo Express)</div>
+ <div class="box human"><b>🧑‍💼 Human review queue</b> (from steps 1, 4, 6)<br>Ops console → Approve / Reject.<br>Approved refunds are saved as “approved by support lead”.</div>
+</div>
+<div class="legend"><span><i style="background:#f59e0b"></i>Guardrail</span><span><i style="background:#7c3aed"></i>AI (LLM)</span><span><i style="background:#0284c7"></i>Tool</span><span><i style="background:#16a34a"></i>Log / database</span></div>
+</div></body></html>

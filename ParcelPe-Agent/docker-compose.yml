@@ -1,0 +1,39 @@
+# One command runs everything:  docker compose up --build
+#   App            -> http://localhost:3000
+#   API docs       -> http://localhost:8000/docs
+#   Mongo Express  -> http://localhost:8081   (browse the database)
+services:
+  mongo:
+    image: mongo:7
+    ports: ["27017:27017"]          # so Compass / mongosh on your laptop can connect
+    volumes: [mongo-data:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      retries: 10
+
+  mongo-express:
+    image: mongo-express:1
+    ports: ["8081:8081"]
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017
+      ME_CONFIG_BASICAUTH: "false"
+    depends_on:
+      mongo: { condition: service_healthy }
+
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      MONGO_URI: mongodb://mongo:27017   # inside Docker, Mongo is reached by its service name
+    ports: ["8000:8000"]
+    depends_on:
+      mongo: { condition: service_healthy }
+
+  frontend:
+    build: ./frontend
+    ports: ["3000:80"]
+    depends_on: [backend]
+
+volumes:
+  mongo-data:
