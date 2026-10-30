@@ -4,6 +4,7 @@
     python run_inbox.py --steps    # also show every step the agent took
     python run_inbox.py --id MSG-004 --steps   # just one message
 """
+from __future__ import annotations
 import argparse
 import json
 

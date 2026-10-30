@@ -5,7 +5,7 @@
 2. Open http://localhost:3000. Top bar should show **LLM gemini · …** and **DB mongodb**.
 3. Press **Reset demo**.
 4. Keep a damaged-parcel photo on your desktop for run 03.
-5. Backup plan: if Wi-Fi or Gemini fails, set `LLM_PROVIDER=mock` in `.env` and restart. Same demo, works offline.
+5. Run `bash start.sh` and check it prints `✓ gemini … is working`. Have phone hotspot ready in case venue Wi-Fi fails.
 
 ## Opening line
 > "This is ParcelPe's support desk. On the left is a customer's phone. In the middle is what happens inside the AI. On the right is exactly what gets saved in the database. Watch the 7 steps."
@@ -52,6 +52,7 @@ Click **05** → send. Instant answer from the tracking tool.
 | Question | Answer |
 |---|---|
 | What if the photo is fine and the refund is ₹1,200? | Under ₹2,000, photo present, within 48 hours, no flags → AI refunds ₹1,200 and logs it. If Gemini sees the photo doesn't show damage, it's flagged → human. |
+| Is this just rules? | No — type any message in Hindi, Kannada or a mix and watch step 2: Gemini explains what it understood. |
 | What if Gemini goes down? | Every message goes to a human. Nothing breaks, nothing wrong gets sent. |
 | Where is the data? | MongoDB: `parcels`, `messages`, `tickets`, `refunds`. Open http://localhost:8081. |
 | How do you change the ₹2,000 limit? | `.env` → `REFUND_AUTO_LIMIT_INR`. No code change. |

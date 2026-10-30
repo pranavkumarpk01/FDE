@@ -10,6 +10,16 @@ An AI agent that answers ParcelPe's customer messages (tracking, refunds, damage
 
 ---
 
+## ⚡ Just want to run the demo?
+
+```bash
+bash start.sh        # then open http://localhost:8000
+```
+Only Python 3 needed — no Docker, MongoDB or Node. See **[RUN_DEMO.md](RUN_DEMO.md)** for the 5 stage cases.
+The rest of this guide is for MongoDB, Gemini, Docker and deploying.
+
+---
+
 ## 1. Architecture
 
 ![Architecture](docs/img/architecture.png)

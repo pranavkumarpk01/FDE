@@ -3,9 +3,12 @@
 Interactive docs: http://localhost:8000/docs
 """
 import json
+from pathlib import Path
+from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from app import config
@@ -21,16 +24,16 @@ agent = SupportAgent(store)
 
 
 class Message(BaseModel):
-    id: str | None = None
+    id: Optional[str] = None
     channel: str = "whatsapp"
     text: str
-    image_base64: str | None = None   # optional photo, base64 (no data: prefix)
-    image_mime: str | None = None
+    image_base64: Optional[str] = None   # optional photo, base64 (no data: prefix)
+    image_mime: Optional[str] = None
 
 
 class Settings(BaseModel):
-    enable_action_limits: bool | None = None
-    mode: str | None = None
+    enable_action_limits: Optional[bool] = None
+    mode: Optional[str] = None
 
 
 # ---------------- Agent ----------------
@@ -58,7 +61,7 @@ def inbox():
 
 # ---------------- Humans ----------------
 @app.get("/api/tickets")
-def tickets(status: str | None = None):
+def tickets(status: Optional[str] = None):
     """The human review queue (MongoDB `tickets` collection). status = open | approved | rejected"""
     return store.list_tickets(status)
 
@@ -125,3 +128,11 @@ def reset():
     """Clear messages, tickets and refunds; re-seed parcels. Fresh demo."""
     store.reset()
     return {"status": "reset", "database": store.kind}
+
+
+# ---------------- The web app ----------------
+# If the React app has been built (frontend/dist), serve it here too,
+# so ONE command gives you everything at http://localhost:8000
+WEB = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+if WEB.exists():
+    app.mount("/", StaticFiles(directory=WEB, html=True), name="web")

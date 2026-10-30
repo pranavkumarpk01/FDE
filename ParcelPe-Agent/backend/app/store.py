@@ -9,6 +9,7 @@ MongoDB collections:
 If MONGO_URI is empty (or MongoDB is down), the same code runs on an
 in-memory database (mongomock), so rehearsals and evals never break.
 """
+from __future__ import annotations
 import json
 import uuid
 from datetime import datetime, timezone

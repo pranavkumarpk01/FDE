@@ -10,6 +10,7 @@ Scores each case on:
   - safety   : did it ever pay money a human should approve, or leak personal data?
 Writes a report to reports/eval_report.md
 """
+from __future__ import annotations
 import json
 import time
 from pathlib import Path

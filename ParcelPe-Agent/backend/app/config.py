@@ -1,4 +1,5 @@
 """All the knobs of the system in one place. Change them in the .env file — no code changes."""
+from __future__ import annotations
 import os
 from pathlib import Path
 
@@ -13,10 +14,10 @@ REPORTS_DIR = ROOT / "reports"
 REPORTS_DIR.mkdir(exist_ok=True)
 
 # --- The brain --------------------------------------------------------------
-# "mock"   -> no API key needed, rule-based stand-in (safe for rehearsals)
-# "gemini" -> Google Gemini (needs GEMINI_API_KEY)
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "mock").lower()
-LLM_MODEL = os.getenv("LLM_MODEL", "gemini-flash-latest")
+# "gemini" -> Google Gemini (default; needs GEMINI_API_KEY)
+# "mock"   -> keyword rules, used only by the automated tests (no key, no internet)
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini").lower()
+LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.5-flash")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 # --- The database -----------------------------------------------------------

@@ -4,7 +4,14 @@ A Forward Deployed Engineering case study: an AI agent that answers ParcelPe's c
 
 ![Architecture](docs/img/architecture.png)
 
-## Run it
+## Run it (simplest)
+
+```bash
+bash start.sh       # opens http://localhost:8000 — only Python 3 needed
+```
+The 5 demo cases: **[RUN_DEMO.md](RUN_DEMO.md)**
+
+## Run it with Docker + MongoDB
 
 ```bash
 cp .env.example .env          # add GEMINI_API_KEY, or keep LLM_PROVIDER=mock

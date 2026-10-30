@@ -11,6 +11,7 @@
 Each step is recorded with a `kind` (guard / ai / tool / log) and a `status`
 (ok / warn / blocked) so the dashboard can animate it.
 """
+from __future__ import annotations
 import time
 import uuid
 
@@ -61,11 +62,16 @@ class SupportAgent:
         u, used = self.llm.understand(text)
         add(used)
         intent, tid = u.get("intent", "other"), u.get("tracking_id")
-        conf = float(u.get("confidence", 0) or 0)
+        tid = str(tid).strip().upper() if tid else None
+        try:
+            conf = float(u.get("confidence", 0) or 0)
+        except (TypeError, ValueError):
+            conf = 0.0
         if u.get("error"):
             step(2, "Understand (LLM)", u["error"] + " → handing to a human", "ai", "blocked")
             return self._finish(ctx, ESCALATE, {"intent": "other"}, "AI unavailable")
-        step(2, "Understand (LLM)", f"intent = {intent} · tracking ID = {tid or '—'} · confidence = {conf:.2f}", "ai")
+        step(2, "Understand (LLM)", (f"“{u['summary']}” · " if u.get("summary") else "")
+             + f"intent = {intent} · tracking ID = {tid or '—'} · confidence = {conf:.2f}", "ai")
         facts.update({"intent": intent, "tracking_id": tid})
         if intent == "other":
             return self._finish(ctx, ESCALATE, facts, "not a standard request")

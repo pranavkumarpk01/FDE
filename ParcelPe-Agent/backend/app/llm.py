@@ -5,7 +5,9 @@
 
 Every call returns (result, usage) so we can track cost per message.
 """
+from __future__ import annotations
 import base64
+import time
 import json
 import re
 
@@ -67,14 +69,25 @@ class LLM:
     # ---------- Gemini plumbing ----------
     def _gemini(self, system: str, contents: list, json_mode: bool = False) -> tuple[str, dict]:
         from google.genai import types
-        cfg = {"system_instruction": system, "temperature": 0.2, "max_output_tokens": 2048}
+        cfg = {"system_instruction": system, "temperature": 0.2, "max_output_tokens": 4096}
         if json_mode:
             cfg["response_mime_type"] = "application/json"
-        resp = self.client.models.generate_content(model=self.model, contents=contents,
-                                                   config=types.GenerateContentConfig(**cfg))
-        meta = resp.usage_metadata
-        return resp.text or "", {"input_tokens": getattr(meta, "prompt_token_count", 0) or 0,
-                                 "output_tokens": getattr(meta, "candidates_token_count", 0) or 0}
+        # Gemini 2.5 Flash "thinks" before answering; for triage we want fast, direct answers.
+        if "2.5-flash" in self.model:
+            cfg["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+        last = None
+        for attempt in range(2):  # one retry for a busy server / a model that rejects a setting
+            try:
+                resp = self.client.models.generate_content(model=self.model, contents=contents,
+                                                           config=types.GenerateContentConfig(**cfg))
+                meta = resp.usage_metadata
+                return resp.text or "", {"input_tokens": getattr(meta, "prompt_token_count", 0) or 0,
+                                         "output_tokens": getattr(meta, "candidates_token_count", 0) or 0}
+            except Exception as e:
+                last = e
+                cfg.pop("thinking_config", None)
+                time.sleep(1)
+        raise last
 
 
 def _zero() -> dict:

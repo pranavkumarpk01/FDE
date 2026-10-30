@@ -4,6 +4,7 @@
 2. Action limit  : big or risky payouts wait for a human
 3. Output check  : the reply must not promise what wasn't approved or leak data
 """
+from __future__ import annotations
 import re
 
 from app import config

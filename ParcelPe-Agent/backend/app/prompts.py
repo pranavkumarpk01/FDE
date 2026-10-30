@@ -1,4 +1,5 @@
 """The instructions we give the AI — its 'job description'."""
+from __future__ import annotations
 
 UNDERSTAND_SYSTEM = """You are the triage assistant for ParcelPe, a courier company in India.
 Read ONE customer message and return ONLY a JSON object with these keys:

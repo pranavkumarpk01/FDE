@@ -6,6 +6,7 @@
   update_address       change the delivery address, if still allowed
   create_ticket        hand over to a human (the review queue)
 """
+from __future__ import annotations
 from app.store import Store
 
 DECLARED_VALUE_CAP_INR = 10_000
